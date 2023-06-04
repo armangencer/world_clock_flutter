@@ -63,8 +63,7 @@ class _CountryListState extends State<CountryList> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => TimePage(
-                                        country:
-                                            CountryListApi[index].toString()),
+                                        countryName: CountryListApi[index]),
                                   ));
                             },
                             child: Container(

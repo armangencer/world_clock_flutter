@@ -23,6 +23,7 @@ class _HomePageState extends State<HomePage> {
   final url = Uri.parse('http://worldtimeapi.org/api/ip');
   late DateTime ipTime;
   late String timeZone;
+  late String utc;
   bool isLoading = true;
 
   Future callTimeZone() async {
@@ -36,6 +37,7 @@ class _HomePageState extends State<HomePage> {
           setState(() {
             ipTime = result.datetime;
             timeZone = result.timezone;
+            utc = result.utcOffset;
           });
           return result;
         }
@@ -60,8 +62,12 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+      return const Scaffold(
+        body: Center(
+            child: CircularProgressIndicator(
+          backgroundColor: Colors.lightBlue,
+          color: Colors.blueAccent,
+        )),
       );
     } else {
       return ValueListenableBuilder<bool>(
