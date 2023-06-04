@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:world_clock_flutter/screens/time_page.dart';
 import '../theme/color_palette.dart';
 import '../theme/theme.dart';
 
@@ -15,7 +16,7 @@ class CountryList extends StatefulWidget {
 }
 
 class _CountryListState extends State<CountryList> {
-  List CountryList = [];
+  List CountryListApi = [];
 
   @override
   void initState() {
@@ -30,7 +31,7 @@ class _CountryListState extends State<CountryList> {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       setState(() {
-        CountryList = List.from(data);
+        CountryListApi = List.from(data);
       });
     } else {
       print('Hata: ${response.statusCode}');
@@ -48,7 +49,7 @@ class _CountryListState extends State<CountryList> {
           return SizedBox(
             height: 447,
             child: ListView.builder(
-              itemCount: CountryList.length,
+              itemCount: CountryListApi.length,
               itemBuilder: (context, index) {
                 return Column(
                   children: [
@@ -56,26 +57,37 @@ class _CountryListState extends State<CountryList> {
                       children: [
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 10),
-                          child: Container(
-                            height: 54,
-                            width: MediaQuery.of(context).size.width,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                color: value == false
-                                    ? ColorPalette.lightTextBackgroundColor
-                                    : ColorPalette
-                                        .inputDarkThemeBackgroundColor),
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 20, top: 18, bottom: 18),
-                              child: Text(
-                                CountryList[index],
-                                style: TextStyle(
-                                    fontFamily: 'Montserrat',
-                                    fontSize: 15,
-                                    color: value == false
-                                        ? ColorPalette.lightTextColor
-                                        : ColorPalette.darkTextColor),
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => TimePage(
+                                        country:
+                                            CountryListApi[index].toString()),
+                                  ));
+                            },
+                            child: Container(
+                              height: 54,
+                              width: MediaQuery.of(context).size.width,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                  color: value == false
+                                      ? ColorPalette.lightTextBackgroundColor
+                                      : ColorPalette
+                                          .inputDarkThemeBackgroundColor),
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 20, top: 18, bottom: 18),
+                                child: Text(
+                                  CountryListApi[index],
+                                  style: TextStyle(
+                                      fontFamily: 'Montserrat',
+                                      fontSize: 15,
+                                      color: value == false
+                                          ? ColorPalette.lightTextColor
+                                          : ColorPalette.darkTextColor),
+                                ),
                               ),
                             ),
                           ),

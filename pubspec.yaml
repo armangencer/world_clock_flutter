@@ -42,10 +42,12 @@ dependencies:
   provider: ^6.0.5
   http: ^0.13.6
   flutter_launcher_icons: ^0.13.1
+  intl: ^0.18.1
 flutter_icons:
   android: true
   ios: true
   image_path: 'assets/images/logo.png'
+  
 
 
 
