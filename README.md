@@ -11,7 +11,7 @@
 <a href="https://www.linkedin.com/in/arman-gen%c3%a7er-71a058182/" target="blank"><img align="center" src="https://play-lh.googleusercontent.com/kMofEFLjobZy_bCuaiDogzBcUT-dz3BBbOrIEjJ-hqOabjK8ieuevGe6wlTD15QzOqw" alt="https://www.linkedin.com/in/arman-gen%c3%a7er-71a058182/" height="30" width="40" /></a>
 </p>
 
-<img src="https://github.com/armangencer/world_clock_flutter/blob/master/assets/images/preview.jpg" alt="Preview">
+<img src="https://github.com/armangencer/world_clock_flutter/blob/master/assets/images/preview.png" alt="Preview">
 
 
 <h3 align="left">Languages and Tools:</h3>
