@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:world_clock_flutter/screens/home_screen.dart';
 import 'dart:ui';
@@ -6,6 +7,9 @@ import 'package:world_clock_flutter/screens/splash_screen.dart';
 import 'package:world_clock_flutter/theme/theme.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   runApp(const MyApp());
 }
 
