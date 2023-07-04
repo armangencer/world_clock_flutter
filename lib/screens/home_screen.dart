@@ -19,16 +19,42 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
+List<String> countryListApi = [];
+List filteredList = [];
+
 class _HomePageState extends State<HomePage> {
-  final url = Uri.parse('http://worldtimeapi.org/api/ip');
+  final TextEditingController searchController = TextEditingController();
+
+  final urlApiIp = ('http://worldtimeapi.org/api/timezone/Europe/Istanbul');
+  final url = 'http://worldtimeapi.org/api/timezone';
   late DateTime ipTime;
   late String timeZone;
   late String utc;
   bool isLoading = true;
 
+  @override
+  void initState() {
+    callTimeZone();
+    getCountry();
+    super.initState();
+  }
+
+  Future getCountry() async {
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      setState(() {
+        countryListApi = List.from(data);
+      });
+    } else {
+      print('Hata: ${response.statusCode}');
+      throw Exception('Hata : ${response.statusCode}');
+    }
+  }
+
   Future callTimeZone() async {
     try {
-      final response = await http.get(url);
+      final response = await http.get(Uri.parse(urlApiIp));
       if (response.statusCode == 200) {
         var result = ipTimeZoneFromJson(response.body);
         print(result.datetime);
@@ -37,7 +63,6 @@ class _HomePageState extends State<HomePage> {
           setState(() {
             ipTime = result.datetime;
             timeZone = result.timezone;
-            utc = result.utcOffset;
           });
           return result;
         }
@@ -53,10 +78,16 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    callTimeZone();
+  void filterSearchResults(String query) {
+    setState(() {
+      if (query.trim().isEmpty) {
+        filteredList = [];
+      } else {
+        filteredList = countryListApi
+            .where((item) => item.toLowerCase().contains(query.toLowerCase()))
+            .toList();
+      }
+    });
   }
 
   @override
@@ -73,92 +104,103 @@ class _HomePageState extends State<HomePage> {
       return ValueListenableBuilder<bool>(
         valueListenable: ThemeIsDark.isDark,
         builder: (context, value, child) {
-          return Scaffold(
-            body: Stack(
-              children: [
-                Container(
-                  height: 199,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: value == false
-                        ? ColorPalette.lightTextBackgroundColor
-                        : ColorPalette.dartTextBackgroundColor,
-                    borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(32),
-                      bottomRight: Radius.circular(32),
+          return SizedBox(
+            height: MediaQuery.of(context).size.height,
+            child: Scaffold(
+              body: SingleChildScrollView(
+                child: Stack(
+                  children: [
+                    Container(
+                      height: 199,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: value == false
+                            ? ColorPalette.lightTextBackgroundColor
+                            : ColorPalette.dartTextBackgroundColor,
+                        borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(32),
+                          bottomRight: Radius.circular(32),
+                        ),
+                      ),
+                      child: const Padding(
+                        padding: EdgeInsets.only(
+                          left: 250,
+                        ),
+                      ),
                     ),
-                  ),
-                  child: const Padding(
-                    padding: EdgeInsets.only(
-                      left: 250,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 33, vertical: 69),
-                  child: Column(
-                    children: [
-                      Row(
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 33, vertical: 69),
+                      child: Column(
                         children: [
-                          Text(
-                            timeZone.toString().toUpperCase(),
-                            style: TextStyle(
-                                fontFamily: 'Montserrat',
-                                fontSize: 15,
-                                color: value == false
-                                    ? ColorPalette.lightTextColor
-                                    : ColorPalette.darkTextColor,
-                                fontWeight: FontWeight.w700),
+                          Row(
+                            children: [
+                              Text(
+                                timeZone.toString().toUpperCase(),
+                                style: TextStyle(
+                                    fontFamily: 'Montserrat',
+                                    fontSize: 15,
+                                    color: value == false
+                                        ? ColorPalette.lightTextColor
+                                        : ColorPalette.darkTextColor,
+                                    fontWeight: FontWeight.w700),
+                              ),
+                            ],
                           ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 5),
+                            child: Row(
+                              children: [
+                                Text(
+                                  DateFormat('HH:mm').format(ipTime),
+                                  style: TextStyle(
+                                    fontSize: 32,
+                                    fontFamily: 'Montserrat',
+                                    fontWeight: FontWeight.w800,
+                                    color: value == false
+                                        ? ColorPalette.lightTextColor
+                                        : ColorPalette.darkTextColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 5),
+                            child: Row(
+                              children: [
+                                Text(
+                                  DateFormat('dd/MM/yyyy').format(ipTime),
+                                  style: TextStyle(
+                                      fontFamily: 'Montserrat',
+                                      fontSize: 15,
+                                      color: value == false
+                                          ? ColorPalette.lightTextColor
+                                          : ColorPalette.darkTextColor,
+                                      fontWeight: FontWeight.w700),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SearchButton(
+                            textEditingController: searchController,
+                            onChanged: (String query) {
+                              filterSearchResults(query);
+                            },
+                          ),
+                          // ignore: prefer_const_constructors
+                          CountryList(),
                         ],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 5),
-                        child: Row(
-                          children: [
-                            Text(
-                              DateFormat('HH:mm').format(ipTime),
-                              style: TextStyle(
-                                fontSize: 32,
-                                fontFamily: 'Montserrat',
-                                fontWeight: FontWeight.w800,
-                                color: value == false
-                                    ? ColorPalette.lightTextColor
-                                    : ColorPalette.darkTextColor,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 5),
-                        child: Row(
-                          children: [
-                            Text(
-                              DateFormat('dd/MM/yyyy').format(ipTime),
-                              style: TextStyle(
-                                  fontFamily: 'Montserrat',
-                                  fontSize: 15,
-                                  color: value == false
-                                      ? ColorPalette.lightTextColor
-                                      : ColorPalette.darkTextColor,
-                                  fontWeight: FontWeight.w700),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SearchButton(),
-                      CountryList(),
-                    ],
-                  ),
+                    ),
+                    const Positioned(
+                      left: 301,
+                      top: 66,
+                      child: ThemeButton(),
+                    ),
+                  ],
                 ),
-                const Positioned(
-                  left: 301,
-                  top: 66,
-                  child: ThemeButton(),
-                ),
-              ],
+              ),
             ),
           );
         },

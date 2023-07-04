@@ -25,7 +25,7 @@ class TimePage extends StatefulWidget {
 class _TimePageState extends State<TimePage> {
   late var selectedDateTime;
   late var utcDate;
-  late var utcOffset;
+  late String utcOffset;
   bool isLoading = true;
 
   Future getCountryTime() async {
@@ -45,8 +45,9 @@ class _TimePageState extends State<TimePage> {
             utcDate = result.utcDatetime;
             utcOffset = result.utcOffset;
           });
+          print(selectedDateTime);
           return result;
-        }
+        } 
       } else {
         print(response.statusCode);
       }
@@ -140,6 +141,7 @@ class _TimePageState extends State<TimePage> {
                   child: Column(
                     children: [
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Padding(
                             padding: const EdgeInsets.only(top: 161),

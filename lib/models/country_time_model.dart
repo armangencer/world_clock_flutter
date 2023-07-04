@@ -49,7 +49,7 @@ class CountryTimeModel {
       CountryTimeModel(
         abbreviation: json["abbreviation"],
         clientIp: json["client_ip"],
-        datetime: DateTime.parse(json["datetime"]),
+        datetime: DateTime.parse(utcAdd(json["datetime"])),
         dayOfWeek: json["day_of_week"],
         dayOfYear: json["day_of_year"],
         dst: json["dst"],
@@ -81,4 +81,13 @@ class CountryTimeModel {
         "utc_offset": utcOffset,
         "week_number": weekNumber,
       };
+}
+
+String utcAdd(String abc) {
+  if (abc.contains('+')) {
+    return abc.split('+')[0];
+  } else {
+    int index = abc.lastIndexOf('-');
+    return abc.substring(0, index);
+  }
 }

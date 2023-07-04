@@ -3,8 +3,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:world_clock_flutter/screens/time_page.dart';
+import '../screens/home_screen.dart';
 import '../theme/color_palette.dart';
 import '../theme/theme.dart';
+import 'search_button.dart';
 
 class CountryList extends StatefulWidget {
   const CountryList({
@@ -16,29 +18,6 @@ class CountryList extends StatefulWidget {
 }
 
 class _CountryListState extends State<CountryList> {
-  List CountryListApi = [];
-
-  @override
-  void initState() {
-    super.initState();
-    getCountry();
-  }
-
-  final url = 'http://worldtimeapi.org/api/timezone';
-
-  Future getCountry() async {
-    final response = await http.get(Uri.parse(url));
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      setState(() {
-        CountryListApi = List.from(data);
-      });
-    } else {
-      print('Hata: ${response.statusCode}');
-      throw Exception('Hata : ${response.statusCode}');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -47,9 +26,11 @@ class _CountryListState extends State<CountryList> {
         valueListenable: ThemeIsDark.isDark,
         builder: (context, value, child) {
           return SizedBox(
-            height: 447,
+            height: 485,
             child: ListView.builder(
-              itemCount: CountryListApi.length,
+              itemCount: filteredList.isEmpty
+                  ? countryListApi.length
+                  : filteredList.length,
               itemBuilder: (context, index) {
                 return Column(
                   children: [
@@ -59,57 +40,75 @@ class _CountryListState extends State<CountryList> {
                           padding: const EdgeInsets.symmetric(vertical: 10),
                           child: GestureDetector(
                             onTap: () {
+                              filteredList.isEmpty
+                                  ? countryListApi[index]
+                                  : filteredList[index];
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => TimePage(
-                                        countryName: CountryListApi[index]),
+                                        countryName: filteredList.isEmpty
+                                            ? countryListApi[index]
+                                            : filteredList[index]),
                                   ));
                             },
-                            child: Container(
-                              height: 54,
-                              width: MediaQuery.of(context).size.width,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  color: value == false
-                                      ? ColorPalette.lightTextBackgroundColor
-                                      : ColorPalette
-                                          .inputDarkThemeBackgroundColor),
-                              child: Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 20, top: 18, bottom: 18),
-                                child: Text(
-                                  CountryListApi[index],
-                                  style: TextStyle(
-                                      fontFamily: 'Montserrat',
-                                      fontSize: 15,
-                                      color: value == false
-                                          ? ColorPalette.lightTextColor
-                                          : ColorPalette.darkTextColor),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    height: 54,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(8),
+                                        color: value == false
+                                            ? ColorPalette
+                                                .lightTextBackgroundColor
+                                            : ColorPalette
+                                                .inputDarkThemeBackgroundColor),
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                        left: 20,
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Text(
+                                            filteredList.isEmpty
+                                                ? countryListApi[index]
+                                                : filteredList[index],
+                                            style: TextStyle(
+                                                fontFamily: 'Montserrat',
+                                                fontSize: 15,
+                                                color: value == false
+                                                    ? ColorPalette
+                                                        .lightTextColor
+                                                    : ColorPalette
+                                                        .darkTextColor),
+                                          ),
+                                          const Spacer(),
+                                          Container(
+                                            height: 31,
+                                            width: 31,
+                                            decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                    width: 2,
+                                                    color: value == false
+                                                        ? Colors.white
+                                                        : ColorPalette
+                                                            .darkBackgroundColor)),
+                                            child: const Icon(
+                                              Icons.arrow_forward_ios,
+                                              size: 10,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                              ),
+                              ],
                             ),
                           ),
                         ),
-                        Positioned(
-                          left: 270,
-                          top: 20,
-                          child: Container(
-                            height: 31,
-                            width: 31,
-                            decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                    width: 2,
-                                    color: value == false
-                                        ? Colors.white
-                                        : ColorPalette.darkBackgroundColor)),
-                            child: const Icon(
-                              Icons.arrow_forward_ios,
-                              size: 10,
-                            ),
-                          ),
-                        )
                       ],
                     ),
                   ],
